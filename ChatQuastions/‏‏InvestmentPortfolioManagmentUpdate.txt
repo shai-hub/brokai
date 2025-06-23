@@ -14,11 +14,11 @@ Take in count that 25 percent tax on the sale of shares in profit.
 
 Respond strictly in raw JSON format only with numbers only – no explanations.
 {
-"stock 1": "portfolio split",
-"stock 2": "portfolio split",
+"Stock Name 1": "portfolio split",
+"stock Name 2": "portfolio split",
         .
         .
         .
-"stock Maximum Stocks Invest": "portfolio split",
-"confidence level of invest until "New sale date"":,
+"stock Name "Maximum Stocks Invest"": "portfolio split",
+"New confidence level of invest":0-100,
 }

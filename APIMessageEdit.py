@@ -28,7 +28,7 @@ def change_stock_message(file_path, stock_name, Buy_date= datetime.now(),
     return content
 
 
-def change_portfoilo_message(file_path, StocksTable,
+def change_portfoilo_message(file_path, StocksTable, StockPortfolioTable,
     saleData= datetime.now() - timedelta(days=6),
     newsaleData=datetime.now() + timedelta(weeks=1),
     max_stocks_invest= 5, desired_confidance= 80):
@@ -43,9 +43,7 @@ def change_portfoilo_message(file_path, StocksTable,
     StocksTable['Sale date'] = pd.to_datatime(StocksTable['Sale date']).normalize()
     StocksTable['Buy date'] = pd.to_datatime(StocksTable['Buy date']).normalize()
 
-    current_potrfoilo = StocksTable.loc[StocksTable['"currently in stock portfolio"'] == 'yes']\
-    .values[0]
-    current_potrfoilo = current_potrfoilo["Stocks Name","Buy date", "portfolio percent"].to_string(index=False)
+    current_potrfoilo = StockPortfolioTable.to_string(index=False)
 
 
     StocksTableForcast = StocksTable.loc[StocksTable['Sale date'] == saleData].values[0]
@@ -81,6 +79,13 @@ def change_portfoilo_message(file_path, StocksTable,
 
     return content
 
-def read_stock_info_response(contant):
-    data = json.loads(contant)
+def read_stock_info_response(content):
+    data = json.loads(content)
     return data["exists"],data["Ticker"],data["Name"],data["Market"],data["Sector"]
+
+def read_stock_info_response(content):
+    data = json.loads(content)
+    return data["up/down"],data["confidence level"],data["stop-loss"]
+
+def read_portfolio_invest(content):
+    return json.loads(content)

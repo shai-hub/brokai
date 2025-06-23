@@ -15,5 +15,5 @@ Respond strictly in raw JSON format only with numbers only – no explanations.
         .
         .
 "stock Maximum Stocks Invest": "portfolio split",
-"confidence level of invest until "Sale date"":,
+"confidence level of invest until "Sale date"":0-100,
 }

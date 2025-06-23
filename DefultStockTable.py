@@ -14,7 +14,6 @@ StockTable = {
 
 df = pd.DataFrame(StockTable).astype({
     "Stocks Name": "string",
-    "currently in stock portfolio": "string",
     "Stock volatility forecast": "int32",
     "Buy date": "datetime64[ns]",
     "Sale date": "datetime64[ns]",
@@ -26,24 +25,20 @@ df = pd.DataFrame(StockTable).astype({
 df.to_excel("StocksTable.xlsx", index=False)
 
 
-StockHistoryForcastEstimateTable = {
-    "Stock volatility forecast": [],
-    "Start date": [],
-    "End date": [],
-    "estimate forecast date": [],
+df1 = pd.DataFrame(StockPortfolioTable).astype({
+    "Stocks Name": [],
+    "Buy date": [],
     "Confidence level": [],
-    "Recommended stop-loss": []
-}
-
-df1 = pd.DataFrame(StockHistoryForcastEstimateTable).astype({
-    "Stock volatility forecast": "int32",
-    "Start date": "datetime64[ns]",
-    "End date": "datetime64[ns]",
-    "estimate forecast date": "datetime64[ns]",
-    "Confidence level": "int32",
-    "Recommended stop-loss": "int32"
+    "Recommended stop-loss": [],
+    "portfolio split": []
 })
 
-with pd.ExcelWriter("StocksForcastHistory.xlsx") as writer:
-    df1.to_excel(writer, sheet_name='ARYT', index=False)
-    df1.to_excel(writer, sheet_name='AAPL', index=False)
+StockPortfolioTable = {
+    "Stocks Name": "string",
+    "Buy date": "datetime64[ns]",
+    "Confidence level":  "int32",
+    "Recommended stop-loss": "int32",
+    "portfolio split": "int32"
+}
+
+df1.to_excel("StockPortfolioTable.xlsx", index=False)

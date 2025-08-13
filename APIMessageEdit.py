@@ -89,6 +89,11 @@ def read_stockInital_info_response(content):
     data = json.loads(json_text)
     return data["up/down"],data["confidence level"],data["stop-loss"]
 
+def read_deepLookStock_info_response(content):
+    json_text = content.choices[0].message.content
+    data = json.loads(json_text)
+    return data["A1"],data["A2"],data["A3"],data["A4"],data["A5"],data["A6"],data["A7"],data["A8"],data["A9"],data["A10"],data["A11"],data["A12"],data["A13"],data["A14"],data["A15"],data["A16"],data["A17"],data["A18"],data["A19"],data["A20"]
+
 def read_portfolio_invest(content):
     json_text = content.choices[0].message.content
     data = json.loads(json_text)

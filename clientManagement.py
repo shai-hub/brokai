@@ -1,51 +1,25 @@
 import pandas as pd
 import os
 from brokai.StockManagement import StockManagement
+from brokai.client import NewModelClientPortfolio
 from datetime import datetime, timedelta
 import random
 import string
 
+def generate_serial(length: int = 12) -> str:
+    characters = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(characters, k=length))
 
 
-class clientProtfolio:
-    
+class clientManagement:
 
-    def __init__(self, AImanage : StockManagement, stock_lists = "stock_lists.xlsx" , stocksTable = "StocksTable.xlsx", deepLook = "DeepTable.xlsx", StockPortfolioTable = "StockPortfolioTable.xlsx" , clientProtfolio="client_portfolio.xlsx"):
-        self.clientProtfolio= clientProtfolio 
+    def __init__(self, AImanage : StockManagement, stock_lists = "stock_lists.xlsx" , stocksTable = "StocksTable.xlsx", deepLook = "DeepTable.xlsx"):
+        self.clientManagement= NewModelClientPortfolio(AImanage) 
         self.columns= ["ClientID", "Ticker", "Name" ,"BuyDate"]
         self.stock_lists= pd.read_excel(stock_lists)
         self.stocksTable= pd.read_excel(stocksTable)
         self.deepLook= pd.read_excel(deepLook)
         self.AImanage= AImanage 
-        # Create the Excel file if it doesn't exist
-        if not os.path.exists(self.clientProtfolio):
-            df = pd.DataFrame(columns=self.columns)
-            df.to_excel(self.clientProtfolio, index=False)
-
-    def load_data(self):
-        return pd.read_excel(self.clientProtfolio)
-    
-    def generate_serial(self, length=12):
-        characters = string.ascii_uppercase + string.digits
-        return ''.join(random.choices(characters, k=length))
-
-    def save_data(self, df):
-        df.to_excel(self.clientProtfolio, index=False)
-
-    def add_stock(self, client_id, stock_name, buy_date):
-        df = self.load_data()
-        stock_name , ticker ,exists = self.AImanage.add_stock_to_list(self.AImanage.client, stock_name)
-        
-        if (exists): 
-            # Check if the stock already exists for this client
-            if ((df["ClientID"] == client_id) & (df["Name"] == stock_name)).any():
-                print(f"Client {client_id} already has stock {stock_name}.")
-                return
-            df.loc[len(df)] = [client_id, ticker, stock_name, buy_date]
-            self.save_data(df)
-            print(f"Added stock {stock_name} for client {client_id}.")
-            return
-        print("the stocks dosent exists")
 
     def delete_stock(self, client_id, stock_name):
         df = self.load_data()
@@ -73,12 +47,11 @@ class clientProtfolio:
 
         return sorted_recStock.head(3)
         
-    def Clientpredict(self , ID , sale_date = datetime.now() + timedelta(days=365)):
-        SN = self.generate_serial()
-        df = self.load_data()
+    def Clientpredict(self , ID , sale_date = datetime.now() + timedelta(days=30)):
+        SN = generate_serial()
+        df = self.clientManagement.get_client_holdings(ID)
         for _,row in df.iterrows():
-            if row['ClientID'] == ID:
-                self.AImanage.get_forcast_stock(self.AImanage.client, row['Name'], row['BuyDate'], sale_date, SN)
+            self.AImanage.get_forcast_stock(self.AImanage.client, row['ticker'], datetime.now(), sale_date, SN)
 
         df2 = pd.read_excel("StocksTable.xlsx")
         RelStock = df2[(df2['Serial number']) == SN] 
@@ -111,4 +84,4 @@ class clientProtfolio:
             print("Stock Status: Very Weak")
             return "Stock Status: Very Weak"
 
-        
+

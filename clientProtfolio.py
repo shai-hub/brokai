@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import random
 import string
 
-
+#this is the old model not relevant for now!!!
 
 class clientProtfolio:
     

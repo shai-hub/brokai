@@ -11,7 +11,6 @@ def change_stock_message(file_path, stock_name, Buy_date= datetime.now(),
     :param stock_name: relevant stock name
     :return: new contest message
     """
-
  
     replacements_dict = {
         "Stock Name": stock_name,
@@ -98,3 +97,4 @@ def read_deepLookStock_info_response(content):
 def read_portfolio_invest(content):
     json_text = content.choices[0].message.content
     data = json.loads(json_text)
+    return json.loads(content)

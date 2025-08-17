@@ -67,3 +67,94 @@
 | P1 | Basic Website (MVP) | Results page, stock details, Top 10 | Responsive demo (desktop/mobile) | APIs D2-D5, M3 | High |
 | P2 | Demo Account | Signup, dummy data, limited scenarios | Demo user runs filters+recommendations | P1 | High |
 | P3 | AI Portfolio Display | Portfolio page, trade history | Graphs + explanations (from M6) | P1, M6 | High |
+
+### F. Competitive Advantage & Differentiators
+
+| ID | Task | Sub-steps | DoD | Dependencies | Priority |
+|---|---|---|---|---|---|
+| X1 | Full Transparency | Add visual explanations (graphs of sentiment vs price, sources, SHAP reports) | Each recommendation must include a “Why” panel | M6 | High |
+| X2 | Future Simulation Engine | Build “what-if” scenarios (interest rate hike, war, inflation) | Users can run custom scenarios and see expected impact | B4 | High |
+| X3 | Social-Driven Insights | Real-time influencer & sentiment correlation dashboards | Graph showing correlation between tweets/posts and stock moves | N4 | High |
+| X4 | AI Portfolio Manager | AI-managed demo portfolio, compared to benchmarks (S&P500, TA-125) | Live demo portfolio with performance tracking | P3 | High |
+| X5 | Risk Management Layer | Implement stops, VaR/ES, exposure rules in live + backtest | System prevents reckless trades | B5 | High |
+| X6 | Demo Experience | Free demo with virtual portfolio | New users can try without risk | P2 | Medium |
+| X7 | Dual Market Coverage | Support US + Israel equities + Crypto in one tool | Seamless cross-market analysis | D2, D3, D6 | High |
+| X8 | Regulatory Compliance | Ensure GDPR, ESG, MiFID II alignment | Compliance docs & automated reports | D7 | Medium |
+
+
+# Brokai — Project Roadmap & Team Breakdown
+
+This README serves as the central roadmap for Brokai.  
+Each section is owned by a dedicated team. For details, see the linked docs.
+
+---
+
+## ✅ Completed
+- Portfolio valuation based on financial analysis & news
+- Stock scoring (3-year history & performance)
+- Future valuation (financial reports + news)
+- Recommended stocks list
+
+---
+
+## 📋 Workstreams & Teams
+
+### 1. Data & Integrations Team
+**Scope**: Market data (US, IL), crypto, storage, compliance  
+**Tasks**: D1–D7, X7, X8  
+**Deliverables**: APIs for OHLCV, news feeds, crypto integration, DB schema  
+📄 [docs/data_integrations.md](docs/data_integrations.md)
+
+---
+
+### 2. News & Social AI Team
+**Scope**: Social feeds, influencers, sentiment, breaking events  
+**Tasks**: N1–N5, X3  
+**Deliverables**: Ingestion pipelines, influencer scoring, correlation dashboards  
+📄 [docs/news_social.md](docs/news_social.md)
+
+---
+
+### 3. Modeling & Forecasting Team
+**Scope**: Features, ML models, explainability, scenario modeling  
+**Tasks**: M1–M6, X1, X2  
+**Deliverables**: Forecast models, SHAP explainability, scenario simulations  
+📄 [docs/modeling.md](docs/modeling.md)
+
+---
+
+### 4. Quant & Decisioning Team
+**Scope**: Backtesting, KPIs, risk management, trading logic  
+**Tasks**: B1–B5, X2, X5  
+**Deliverables**: Backtesting engine, performance metrics, risk framework  
+📄 [docs/quant_decision.md](docs/quant_decision.md)
+
+---
+
+### 5. Product & Frontend Team
+**Scope**: Website MVP, demo account, portfolio UI  
+**Tasks**: P1–P3, X4, X6  
+**Deliverables**: Responsive website, demo user account, AI-managed portfolio view  
+📄 [docs/product.md](docs/product.md)
+
+---
+
+### 6. BizDev & Strategy Team
+**Scope**: Competitive positioning, GTM strategy, investor materials  
+**Tasks**: X1–X8 (non-technical parts)  
+**Deliverables**: Competitor matrix, go-to-market strategy, compliance docs  
+📄 [docs/strategy.md](docs/strategy.md)
+
+---
+
+## 🔍 How to Track Progress
+- Each team updates their doc under `/docs/` folder.  
+- Use checkboxes `[ ]` / `[x]` for tasks in progress vs completed.  
+- Weekly sync: update this README with high-level status.
+
+---
+
+## 📊 Next Steps
+- [ ] Set up `/docs/` folder with team-specific markdown files  
+- [ ] Assign team leads for each stream  
+- [ ] Move backlog tasks into GitHub Projects or Jira for sprint planning

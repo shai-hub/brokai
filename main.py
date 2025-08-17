@@ -7,7 +7,7 @@ from openai import OpenAI
 import pandas as pd
 
 df = pd.read_excel("StocksTable.xlsx")
-client = OpenAI('api_key')
+client = OpenAI('API-KEY')
  
 response = client.responses.create(
     model="gpt-3.5-turbo",

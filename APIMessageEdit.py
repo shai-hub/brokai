@@ -12,11 +12,12 @@ def change_stock_message(file_path, stock_name, Buy_date= datetime.now(),
     :return: new contest message
     """
 
+ 
     replacements_dict = {
         "Stock Name": stock_name,
-        "Buy date": Buy_date,
-        "Sale date": Sale_date,
-        "estimate forecast date": estimate_forecast_date
+        "Buy date": Buy_date.strftime("%Y-%m-%d %H:%M:%S"),
+        "Sale date": Sale_date.strftime("%Y-%m-%d %H:%M:%S"),
+        "estimate forecast date": estimate_forecast_date.strftime("%Y-%m-%d %H:%M:%S")
     }
 
     with open(file_path, "r", encoding="utf-8") as file:
@@ -40,15 +41,15 @@ def change_portfoilo_message(file_path, StocksTable, StockPortfolioTable,
     :return: new contest message
     """
 
-    StocksTable['Sale date'] = pd.to_datatime(StocksTable['Sale date']).normalize()
-    StocksTable['Buy date'] = pd.to_datatime(StocksTable['Buy date']).normalize()
+    StocksTable['Sale date'] = pd.to_datetime(StocksTable['Sale date']).normalize()
+    StocksTable['Buy date'] = pd.to_datetime(StocksTable['Buy date']).normalize()
 
     current_potrfoilo = StockPortfolioTable.to_string(index=False)
 
 
     StocksTableForcast = StocksTable.loc[StocksTable['Sale date'] == saleData].values[0]
     StocksTableForcast['estimate forecast date'] = \
-    StocksTableForcast.to_datatime[StocksTableForcast['estimate forecast date']]
+    StocksTableForcast.to_datetime[StocksTableForcast['estimate forecast date']]
     df_sorted = StocksTableForcast.sort_values(['Stocks Name', 'estimate forecast date'],ascending=[True, False])
     StocksTable= df_sorted.drop_duplicates('Stocks Name', keep= 'first')
     StocksTableStr = StocksTable.drop(["currently in stock portfolio", "portfolio percent"]).to_string(index=False)
@@ -80,12 +81,20 @@ def change_portfoilo_message(file_path, StocksTable, StockPortfolioTable,
     return content
 
 def read_stock_info_response(content):
-    data = json.loads(content)
-    return data["exists"],data["Ticker"],data["Name"],data["Market"],data["Sector"]
+    json_text = content.choices[0].message.content
+    data = json.loads(json_text)
+    return data["Exists"],data["Ticker"],data["Name"],data["Market"],data["Sector"]
 
-def read_stock_info_response(content):
-    data = json.loads(content)
+def read_stockInital_info_response(content):
+    json_text = content.choices[0].message.content
+    data = json.loads(json_text)
     return data["up/down"],data["confidence level"],data["stop-loss"]
 
+def read_deepLookStock_info_response(content):
+    json_text = content.choices[0].message.content
+    data = json.loads(json_text)
+    return data["A1"],data["A2"],data["A3"],data["A4"],data["A5"],data["A6"],data["A7"],data["A8"],data["A9"],data["A10"],data["A11"],data["A12"],data["A13"],data["A14"],data["A15"],data["A16"],data["A17"],data["A18"],data["A19"],data["A20"]
+
 def read_portfolio_invest(content):
-    return json.loads(content)
+    json_text = content.choices[0].message.content
+    data = json.loads(json_text)

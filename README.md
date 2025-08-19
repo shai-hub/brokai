@@ -19,8 +19,8 @@
 
 ### A. Data & Integrations (Market/News/Crypto)
 
-| ID | Task | Sub-steps | DoD | Dependencies | Priority |
-|---|---|---|---|---|---|
+| ID | Task | Sub-steps | DoD | Dependencies | Priority |Done by
+|---|---|---|---|---|---|---|
 | D1 | Select real-time market data provider | Map providers (Polygon/IEX/Alpaca/IB/Bursa IL), check SLA & cost | Comparison table + written decision | - | High |
 | D2 | Integrate Market Data (US) | Connect API, retry logic, throttling, caching | Internal endpoint returning OHLCV/Level-1 | D1 | High |
 | D3 | Integrate Market Data (IL) | Connect TASE/broker, ticker mapping | Internal endpoint for IL data + delay validation | D1 | High |
@@ -31,13 +31,13 @@
 
 ### B. News, Social & Influencers
 
-| ID | Task | Sub-steps | DoD | Dependencies | Priority |
-|---|---|---|---|---|---|
-| N1 | Twitter/X Integration | API/alternative, text+metadata ingestion | Scheduled ingestion, storage, normalization | D7 | High |
-| N2 | Instagram/Threads Integration | Legal/ethical access, provider integration | Data per creator/hashtag available | D7 | Medium |
-| N3 | Influencer Discovery | Build seed list, rank by engagement/PageRank | Table of influencers with scores | N1-N2 | Medium |
-| N4 | Text-to-Market Impact | Model linkage tweet/post ↔ return/vol | Correlation/VAR/Granger + significance report | N1 | High |
-| N5 | Breaking Alerts | Rules/ML for major event detection | Alert with ticker/reason/source | D4, N1 | High |
+| ID | Task | Sub-steps | DoD | Dependencies | Priority | Do |
+|---|---|---|---|---|---|---|
+| N1 | Twitter/X Integration | API/alternative, text+metadata ingestion | Scheduled ingestion, storage, normalization | D7 | High | Ido |
+| N2 | Instagram/Threads Integration | Legal/ethical access, provider integration | Data per creator/hashtag available | D7 | Medium | - |
+| N3 | Influencer Discovery | Build seed list, rank by engagement/PageRank | Table of influencers with scores | N1-N2 | Medium | - |
+| N4 | Text-to-Market Impact | Model linkage tweet/post ↔ return/vol | Correlation/VAR/Granger + significance report | N1 | High | - |
+| N5 | Breaking Alerts | Rules/ML for major event detection | Alert with ticker/reason/source | D4, N1 | High | - |
 
 ### C. Modeling & Forecasting
 

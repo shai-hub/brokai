@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import pandas as pd
-from  brokai.APIMessageEdit import *  # assumes helpers like change_stock_message, read_* are defined here
+from  APIMessageEdit import *  # assumes helpers like change_stock_message, read_* are defined here
 from openai import OpenAI
 import yfinance as yf
 import os

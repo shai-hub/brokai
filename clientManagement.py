@@ -1,7 +1,7 @@
 import pandas as pd
 import os
-from brokai.StockManagement import StockManagement
-from brokai.client import NewModelClientPortfolio
+from StockManagement import StockManagement
+from client import NewModelClientPortfolio
 from datetime import datetime, timedelta
 import random
 import string

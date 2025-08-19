@@ -1,7 +1,7 @@
 # client_portfolio.py
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Any
-from brokai.StockManagement import StockManagement
+from StockManagement import StockManagement
 from datetime import datetime, timedelta
 import pandas as pd
 import yfinance as yf

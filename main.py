@@ -15,6 +15,7 @@ import os
 # p = NewModelClientPortfolio(api_key)
 # client_id = "C001"
 # p.add_trade_for_client(client_id, "AAPL", "US", "BUY", 10, 180.00, datetime(2025,8,1,14,0))
+api_key = "api_key"
 sm = StockManagement(api_key)
 cp = clientManagement(sm)
 cp.Clientpredict("C001")

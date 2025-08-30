@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import pandas as pd
-from  brokai.APIMessageEdit import *  # assumes helpers like change_stock_message, read_* are defined here
+from APIMessageEdit import *  # assumes helpers like change_stock_message, read_* are defined here
+from Xclient import *
 from openai import OpenAI
 import yfinance as yf
 import os
@@ -13,17 +14,18 @@ class StockManagement:
       - Pulling financial statements & intraday prices via yfinance for grounding
 
     Files (expected schema comes from your LLM helpers):
-      • stock_lists.xlsx         -> [Ticker, Name, Market, Sector]
+      • stockLists.xlsx         -> [Ticker, Name, Market, Sector,TwitterUsers...]
       • StocksTable.xlsx         -> (AI forecast outputs; columns used below)
       • DeepTable.xlsx           -> (AI deep-analysis outputs; A1..A20 etc.)
       • StockPortfolioTable.xlsx -> (AI portfolio suggestions; used in get_portfolio_invest)
     """
 
-    def __init__(self, AI_key,
-                 stock_lists="stock_lists.xlsx",
-                 stocksTable="StocksTable.xlsx",
-                 deepTable="DeepTable.xlsx",
-                 StockPortfolioTable="StockPortfolioTable.xlsx"):
+    def __init__(self, AI_key, X_bearer_token,
+                 stockLists="brokai\StocksExcel\StockList.xlsx",
+                 stocksTable="brokai\StocksExcel\StocksTable.xlsx",
+                 deepTable="brokai\StocksExcel\DeepTable.xlsx",
+                 StockPortfolioTable="brokai\StocksExcel\StockPortfolioTable.xlsx"):
+                  
         """
         Load working tables and create an OpenAI client.
 
@@ -31,13 +33,15 @@ class StockManagement:
               If you want a softer behavior, guard with os.path.exists and create empty frames.
         """
         # Consider wrapping with exists checks if these files may not exist yet
-        self.stock_lists = pd.read_excel(stock_lists)
+        self.stockLists = pd.read_excel(stockLists)
         self.stocksTable = pd.read_excel(stocksTable)
         self.deepTable = pd.read_excel(deepTable)
         self.StockPortfolioTable = pd.read_excel(StockPortfolioTable)
 
         # OpenAI client for chat completions
         self.client = OpenAI(api_key=AI_key)
+        #Twitter client for data source
+        self.X = XClient(X_bearer_token)
 
     def printHistoryStockForcast(self, StockName: str) -> None:
         """
@@ -56,51 +60,7 @@ class StockManagement:
         result = result.drop(["currently in stock portfolio", "portfolio percent"], errors="ignore")
         print(result.to_string(index=False))
 
-    def add_stock_to_list(self, client: OpenAI, StockName: str):
-        """
-        Ask the LLM to validate/find Ticker/Name/Market/Sector for a plain StockName, and
-        append it to stock_lists.xlsx if it doesn't already exist.
-
-        Returns:
-            tuple: (Name, Ticker, exists_bool) where 'exists_bool' indicates whether the
-                   stock was already present in stock_lists BEFORE this call.
-
-        Raises:
-            ValueError: if StockName contains non-letter characters (current rule).
-        """
-        # Basic input guard: only letters (your original rule)
-        no_spaces = StockName.replace(" ", "")
-        if not no_spaces.isalpha():
-            raise ValueError("StockName must contain only letters")
-
-        # Prompt template and LLM call
-        content = change_stock_message("ChatQuastions/StockInfo.txt", StockName)
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": content}]
-        )
-        reply = response.choices[0].message.content
-        print(reply)
-
-        # Parse LLM response (helper must return these 5 fields)
-        exists, Ticker, Name, Market, Sector = read_stock_info_response(response)
-
-        if (exists == 'yes'):
-            # Check if already in table by Name (your existing logic)
-            already = ((self.stock_lists["Name"] == Name)).any()
-
-            if not already:
-                # Append and persist
-                self.stock_lists.loc[len(self.stock_lists)] = [Ticker, Name, Market, Sector]
-                self.stock_lists.to_excel("stock_lists.xlsx", index=False)
-                self.stock_lists = pd.read_excel("stock_lists.xlsx")
-                print("The stock has been added to the stock list.")
-            else:
-                print("This stock already exists in the stock list.")
-            return Name, Ticker, already
-
-        # If exists != 'yes' you return None implicitly (same as your original)
-        # You could return a sentinel here if you prefer.
+   #check if work! #and check the massage I updated!!
 
     def get_forcast_stock(self, client: OpenAI, stock_name: str,
                           buy_date: datetime, sale_date: datetime, serialNum: str) -> None:
@@ -122,24 +82,36 @@ class StockManagement:
         estimate_forecast_date = datetime.now().replace(second=0, microsecond=0)
 
         # Filter universe row for grounding (NOTE: your comment says "for old model "Ticker" -> "Name"")
-        df = self.stock_lists
-        df = df[df["Ticker"] == stock_name]  # If stock_name is actually Name, switch to df["Name"] == stock_name
+        df = self.stockLists
+        df = df[df["Name"] == stock_name]  # If stock_name is actually Name, switch to df["Name"] == stock_name
 
         # --- Guard: avoid index errors if not found ---
         if df.empty:
-            print(f"[WARN] Ticker '{stock_name}' not found in stock_lists. Skipping forecast.")
+            print(f"[WARN] Stock :  '{stock_name}' not found in stockLists. Skipping forecast.")
             return
+        
+            # Select only the columns that hold Twitter users
+        user_cols = ["User1", "User2", "User3", "User4", "User5", "User6"]
 
-        # Pass ticker and market to yfinance grounding
+        # Extract as a list of strings (dropping NaN if missing values exist)
+        TwitterLists = df[user_cols].values.flatten().tolist()
+        TwitterLists = [u for u in TwitterLists if pd.notna(u)]
+
+        #get the rellevent twittes for this stocks
+        twittes = self.X.users_tweets_bulk_since(TwitterLists, (datetime.now()- timedelta(weeks=1))) #can change the start time for close or far estimate
+        twittes = twittes.to_string(index=True)
+        print(twittes)
+        # # Pass ticker and market to yfinance grounding
         FinancialStat = self.getFinancialStatements(df["Ticker"].iloc[0], df["Market"].iloc[0])
-
+        print(FinancialStat)
         # Compose the final prompt
         content = change_stock_message(file_path, stock_name, buy_date, sale_date, estimate_forecast_date)
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4.1-mini",
             messages=[
                 {"role": "system", "content": "You are a precise financial data analyst."},
-                {"role": "user", "content": f"{FinancialStat}\n\n{content}"}
+                {"role": "user", "content": f"{FinancialStat}\n\n{content}"},
+                {"role": "user", "content": f"{twittes}\n\n{content}"} 
             ]
         )
         reply = response.choices[0].message.content
@@ -161,8 +133,8 @@ class StockManagement:
             [],   # placeholders (you had two list columns)
             []
         ]
-        self.stocksTable.to_excel("StocksTable.xlsx", index=False)
-        self.stocksTable = pd.read_excel("StocksTable.xlsx")
+        self.stocksTable.to_excel("brokai\StocksExcel\StocksTable.xlsx", index=False)
+        self.stocksTable = pd.read_excel("brokai\StocksExcel\StocksTable.xlsx")
 
     def deepStock(self, client: OpenAI, stock_name: str, buy_date: datetime, serialNum: str) -> None:
         """
@@ -180,11 +152,11 @@ class StockManagement:
         file_path = "ChatQuastions/deeplookStock.txt"
 
         # Lookup row in universe by NAME (your original code uses Name here)
-        df = self.stock_lists
+        df = self.stockLists
         df = df[df["Name"] == stock_name]
 
         if df.empty:
-            print(f"[WARN] Name '{stock_name}' not found in stock_lists. Skipping deepStock.")
+            print(f"[WARN] Name '{stock_name}' not found in stockLists. Skipping deepStock.")
             return
 
         # Ground with yfinance
@@ -212,8 +184,8 @@ class StockManagement:
             A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,
             A11,A12,A13,A14,A15,A16,A17,A18,A19,A20
         ]
-        self.deepTable.to_excel("DeepTable.xlsx", index=False)   # FIX from "deepTable.xlsx"
-        self.deepTable = pd.read_excel("DeepTable.xlsx")
+        self.deepTable.to_excel("brokai\StocksExcel\DeepTable.xlsx", index=False)   # FIX from "deepTable.xlsx"
+        self.deepTable = pd.read_excel("brokai\StocksExcel\DeepTable.xlsx")
 
     def get_portfolio_invest(self, client: OpenAI, sale_date: datetime,
                               max_stock_incest: int, desired_confidence: int):
@@ -300,10 +272,7 @@ class StockManagement:
             - Yahoo uses trailing '.TA' for Tel Aviv tickers
             - Some tickers may return empty DataFrames; we still format them
         """
-        # Add .TA for IL market (simple rule — adjust if you support more exchanges)
-        if market == "IL":
-            Ticker = f"{Ticker}.TA"
-
+    
         ticker = yf.Ticker(Ticker)
 
         # Pull statements (can be empty depending on ticker)
@@ -320,50 +289,52 @@ class StockManagement:
             return "(no data)"
 
         data_text = f"""
-=== Income Statement ===
-{df_to_text(income_statement)}
+        === Income Statement ===
+        {df_to_text(income_statement)}
 
-=== Balance Sheet ===
-{df_to_text(balance_sheet)}
+        === Balance Sheet ===
+        {df_to_text(balance_sheet)}
 
-=== Cash Flow ===
-{df_to_text(cash_flow)}
+        === Cash Flow ===
+        {df_to_text(cash_flow)}
 
-=== Intraday Prices (1 min) ===
-{df_to_text(intraday_prices.tail(30))}  # last ~30 minutes
-"""
+        === Intraday Prices (1 min) ===
+        {df_to_text(intraday_prices.tail(30))}  # last ~30 minutes
+        """
         return data_text
 
-    # -------- new model --------
-    def Client_add_stock_to_list(self, client: OpenAI, Ticker: str):
+   
+    def add_stock_to_list(self, client: OpenAI, Ticker: str):
         """
         Variant for the “new model”: given a Ticker (letters-only), ask the LLM to
-        return (exists, Ticker, Name, Market, Sector) and append to stock_lists if new.
-
-        Returns:
-            tuple: (Name, Ticker, exists_bool_in_table) if exists == 'yes'
+     
         """
         # Basic input guard: letters only (like your original)
         no_spaces = Ticker.replace(" ", "")
         if not no_spaces.isalpha():
             raise ValueError("Ticker must contain only letters")
 
-        content = change_stock_message("ChatQuastions/NewModelStockInfo.txt", Ticker)
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": content}]
-        )
-        reply = response.choices[0].message.content
-        print(reply)
+        already = ((self.stockLists["Ticker"] == Ticker)).any()
 
-        exists, Ticker, Name, Market, Sector = read_stock_info_response(response)
-        if (exists == 'yes'):
-            already = ((self.stock_lists["Name"] == Name)).any()
-            if not already:
-                self.stock_lists.loc[len(self.stock_lists)] = [Ticker, Name, Market, Sector]
-                self.stock_lists.to_excel("stock_lists.xlsx", index=False)
-                self.stock_lists = pd.read_excel("stock_lists.xlsx")
-                print("The stock has been added to the stock list.")
-            else:
-                print("This stock already exists in the stock list.")
-            return Name, Ticker, already
+        if not already:
+            content = change_stock_message("ChatQuastions/StockInfo.txt", Ticker)
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": content}]
+            )
+            reply = response.choices[0].message.content
+            print(reply)
+
+            exists, Ticker, Name, Market, Sector , User1 , User2 , User3 , User4 , User5 , User6  = read_stock_info_response(response)
+            if (exists == 'yes'):
+                already = ((self.stockLists["Name"] == Name)).any()
+                if not already:
+                    self.stockLists.loc[len(self.stockLists)] = [Ticker, Name, Market, Sector , User1 , User2 , User3 , User4 , User5 , User6]
+                    self.stockLists.to_excel("brokai\StocksExcel\StockList.xlsx", index=False)
+                    self.stockLists = pd.read_excel("brokai\StocksExcel\StockList.xlsx")
+                    print("The stock has been added to the stock list.")
+                else:
+                    print("This stock already exists in the stock list.")
+        
+        else: 
+            print("This stock already exists in the stock list.")

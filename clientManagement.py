@@ -1,7 +1,7 @@
 import pandas as pd
 import os
-from brokai.StockManagement import StockManagement
-from brokai.client import NewModelClientPortfolio
+from StockManagement import StockManagement
+from client import NewModelClientPortfolio
 from datetime import datetime, timedelta
 import random
 import string
@@ -26,16 +26,16 @@ class clientManagement:
     - This class EXPECTS that:
         • 'StocksTable.xlsx' is where get_forcast_stock writes its outputs
         • 'DeepTable.xlsx' is where deepStock writes its outputs
-        • 'stock_lists.xlsx' contains the universe you want to scan (with columns like Sector, Market, Name)
+        • 'StockLists.xlsx' contains the universe you want to scan (with columns like Sector, Market, Name)
     - It also calls self.load_data() / self.save_data() in delete_stock(), which are NOT defined here.
       If you still want delete_stock() to edit some client-stock mapping file, add those methods or remove delete_stock().
     """
 
     def __init__(self,
                  AImanage: StockManagement,
-                 stock_lists: str = "stock_lists.xlsx",
-                 stocksTable: str = "StocksTable.xlsx",
-                 deepLook: str = "DeepTable.xlsx"):
+                 stock_lists: str = "brokai\StocksExcel\StockList.xlsx",
+                 stocksTable: str = "brokai\StocksExcel\StocksTable.xlsx",
+                 deepLook: str = "brokai\StocksExcel\DeepTable.xlsx"):
         """
         Initialize the manager.
 
@@ -141,7 +141,7 @@ class clientManagement:
                 )
 
         # Pull back the results for THIS run from the AI output file
-        df2 = pd.read_excel("StocksTable.xlsx")
+        df2 = pd.read_excel("brokai\StocksExcel\StocksTable.xlsx")
         # match the 'Buy date' formatting convention used by your AI output writer
         run_key = predict_time.strftime('%Y-%m-%d %H:%M.%f')[:-3]
 
@@ -158,7 +158,7 @@ class clientManagement:
 
         print(sorted_recStock.head(3))
         # Refresh the in-memory stock_lists from file if that's your convention
-        self.stock_lists = pd.read_excel("StocksTable.xlsx")
+        self.stock_lists = pd.read_excel("brokai\StocksExcel\StocksTable.xlsx")
 
         return sorted_recStock.head(3)
 
@@ -199,12 +199,12 @@ class clientManagement:
             )
 
         # Return only the rows for this run
-        df2 = pd.read_excel("StocksTable.xlsx")
+        df2 = pd.read_excel("brokai\StocksExcel\StocksTable.xlsx")
         RelStock = df2[df2['Serial number'] == SN]
         print(RelStock)
 
         # Optional: refresh in-memory copy if you rely on it elsewhere
-        self.stock_lists = pd.read_excel("StocksTable.xlsx")
+        self.stock_lists = pd.read_excel("brokai\StocksExcel\StocksTable.xlsx")
 
         return RelStock
 
@@ -232,8 +232,8 @@ class clientManagement:
         self.AImanage.deepStock(self.AImanage.client, stock_name, today_time, SN)
 
         # Read results for just this run
-        self.deepLook = pd.read_excel("DeepTable.xlsx")
-        df = pd.read_excel("DeepTable.xlsx")
+        self.deepLook = pd.read_excel("brokai\StocksExcel\DeepTable.xlsx")
+        df = pd.read_excel("brokai\StocksExcel\DeepTable.xlsx")
         df = df[df['Serial number'] == SN]
 
         # Safety: ensure we actually got a row

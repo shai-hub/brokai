@@ -1,7 +1,7 @@
 # client_portfolio.py
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Any
-from brokai.StockManagement import StockManagement
+from StockManagement import StockManagement
 from datetime import datetime, timedelta
 import pandas as pd
 import yfinance as yf
@@ -90,7 +90,7 @@ class NewModelClientPortfolio:
         """
         Args:
             StockManagement: an instance of your brokai.StockManagement class
-                             (used for Client_add_stock_to_list).
+                             (used for add_stock_to_list).
         """
         # Trade store (all clients)
         self.trades = pd.DataFrame(columns=[
@@ -187,13 +187,13 @@ class NewModelClientPortfolio:
         AI stock list, add trade, and optionally refresh & save the Excel workbook.
 
         Side-effects:
-            - Calls AImanage.Client_add_stock_to_list(self.AImanage.client, ticker)
+            - Calls AImanage.add_stock_to_list(self.AImanage.client, ticker)
               so your universe stays updated in stock_lists.xlsx
             - When autosave=True, writes the 4-sheet workbook to disk.
         """
         self.ensure_client_loaded(client_id)
         # Register the ticker with your AI universe (you can remove this if not wanted)
-        self.AImanage.Client_add_stock_to_list(self.AImanage.client, ticker)
+        self.AImanage.add_stock_to_list(self.AImanage.client, ticker)
         # Record the trade in memory
         self.add_trade(client_id, ticker, market, side, qty, price, trade_time)
         # Persist (recompute positions + write workbook)

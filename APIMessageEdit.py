@@ -82,7 +82,7 @@ def change_portfoilo_message(file_path, StocksTable, StockPortfolioTable,
 def read_stock_info_response(content):
     json_text = content.choices[0].message.content
     data = json.loads(json_text)
-    return data["Exists"],data["Ticker"],data["Name"],data["Market"],data["Sector"]
+    return data["Exists"],data["Ticker"],data["Name"],data["Market"],data["Sector"],data["User1"],data["User2"],data["User3"],data["User4"],data["User5"],data["User6"] 
 
 def read_stockInital_info_response(content):
     json_text = content.choices[0].message.content

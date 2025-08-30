@@ -1,5 +1,33 @@
 import pandas as pd
 
+StockList = {
+    "Ticker" : [],
+    "Name" : [], 
+    "Market" : [],
+    "Sector" : [],
+    "User1" : [],
+    "User2" : [],
+    "User3" : [],
+    "User4" : [],
+    "User5" : [],
+    "User6" : []
+}
+
+df = pd.DataFrame(StockList).astype({
+    "Ticker" :"string",
+    "Name" :"string", 
+    "Market" :"string",
+    "Sector" :"string",
+    "User1" :"string",
+    "User2" :"string",
+    "User3" :"string",
+    "User4" :"string",
+    "User5" :"string",
+    "User6" :"string"
+})
+
+df.to_excel("StockList.xlsx", index=False)
+
 StockTable = {
     "Serial number" : [],
     "Stocks Name" : [],
@@ -37,7 +65,7 @@ StockPortfolioTable = {
     "portfolio split": []
 }
 
-df1 = pd.DataFrame(StockPortfolioTable).astype({
+df = pd.DataFrame(StockPortfolioTable).astype({
   
 
     "Stocks Name": "string",
@@ -47,7 +75,7 @@ df1 = pd.DataFrame(StockPortfolioTable).astype({
     "portfolio split": "int32"
 })
 
-df1.to_excel("StockPortfolioTable.xlsx", index=False)
+df.to_excel("StockPortfolioTable.xlsx", index=False)
 
 
 

@@ -1,23 +1,28 @@
 # This is a sample Python script.
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-from brokai.StockManagement import StockManagement
-from brokai.clientProtfolio import clientProtfolio 
-from brokai.client import NewModelClientPortfolio 
-from brokai.clientManagement import clientManagement
+from StockManagement import StockManagement
+from client import NewModelClientPortfolio 
+from clientManagement import clientManagement
 from openai import OpenAI
 import pandas as pd
 from datetime import datetime, timedelta
 import os
-
-
 # p = NewModelClientPortfolio(api_key)
 # client_id = "C001"
 # p.add_trade_for_client(client_id, "AAPL", "US", "BUY", 10, 180.00, datetime(2025,8,1,14,0))
 api_key = "AIkey"
-sm = StockManagement(api_key)        
-cp = clientManagement(sm)
-cp.Clientpredict("C001")
+X_bearer_token = "TwitterKey"
+
+sm = StockManagement(api_key,X_bearer_token)        
+
+
+sm.get_forcast_stock(sm.client,"Pfizer Inc.", datetime.now(),(datetime.now() + timedelta(days=7)),"2")
+
+# cp = clientManagement(sm)
+# cp.Clientpredict("C001")
+
+
     # # Load existing client workbook (if exists), then add trades and auto-save each time
     # p.add_trade_for_client(client_id, "AAPL", "US", "BUY", 10, 180.00, datetime(2025,8,1,14,0))
     # p.add_trade_for_client(client_id, "ILCO", "IL", "BUY", 100, 6400.0, datetime(2025,8,4,9,45))
